@@ -21,6 +21,9 @@ Deployment note:
 | GET | `/expenses` | Query: `category` (optional), `sort` (`date_desc` default or `date_asc`) | `{ data: Expense[], total: "150.75", count: 12 }` |
 | GET | `/expenses/summary` | none | `{ data: [{ category, total: "100.00", count: 4 }] }` |
 | GET | `/expenses/category/:category` | path param category | `{ data: Expense[], total: "100.00", count: 4 }` |
+| GET | `/expenses/dashboard/months` | none | `{ data: [{ month: "2025-01", total: "4200.00", count: 12 }] }` |
+| GET | `/expenses/dashboard/months/:month/categories` | month param (`YYYY-MM`) | `{ data: [{ category, total: "2100.00", count: 7, percent: 50.0 }] }` |
+| GET | `/expenses/dashboard/months/:month/categories/:category` | month + category params | `{ expenses: Expense[], total: "2100.00", count: 7 }` |
 
 ## Tech Choices & Rationale
 - Backend runtime: **Node.js + Express** for fast setup and straightforward REST route composition.
@@ -35,7 +38,7 @@ Deployment note:
 - **How money is stored (cents):** all writes convert decimal strings to integer cents (`150.75 -> 15075`) and all reads convert cents to fixed 2-decimal strings.
 - **How idempotency works:** client sends `X-Idempotency-Key`; server inserts with unique key; duplicate key returns original record (200) instead of creating another row.
 - **Why SQLite was chosen:** simple local bootstrap, no external infra, and good fit for a personal-tracker demo.
-- **Dashboard architecture (2-view drill-down pattern):** `selectedCategory` state controls three views (`null` list, `__dashboard` overview, `<category>` drill-down).
+- **Dashboard architecture (3-level month drill-down):** Level 1 = all months, Level 2 = month category breakdown, Level 3 = month+category expense list with strict back-navigation (3→2 keeps month).
 
 ## Trade-offs & What Was Left Out
 - No authentication/multi-user tenancy.

@@ -1,6 +1,8 @@
 const express = require('express');
 const { validateExpense } = require('../middleware/validate');
 
+const MONTH_REGEX = /^\d{4}-\d{2}$/;
+
 function createExpensesRouter(expenseService) {
   const router = express.Router();
 
@@ -12,6 +14,41 @@ function createExpensesRouter(expenseService) {
         idempotencyKey,
       });
       return res.status(result.wasDuplicate ? 200 : 201).json({ data: result.expense });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.get('/dashboard/months', (req, res, next) => {
+    try {
+      const data = expenseService.getMonthlyTotals();
+      return res.status(200).json({ data });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.get('/dashboard/months/:month/categories', (req, res, next) => {
+    try {
+      const { month } = req.params;
+      if (!MONTH_REGEX.test(month)) {
+        return res.status(400).json({ error: 'month must be in YYYY-MM format' });
+      }
+      const data = expenseService.getMonthlyCategoryBreakdown(month);
+      return res.status(200).json({ data });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.get('/dashboard/months/:month/categories/:category', (req, res, next) => {
+    try {
+      const { month, category } = req.params;
+      if (!MONTH_REGEX.test(month)) {
+        return res.status(400).json({ error: 'month must be in YYYY-MM format' });
+      }
+      const result = expenseService.getMonthCategoryExpenses(month, category);
+      return res.status(200).json(result);
     } catch (error) {
       return next(error);
     }

@@ -86,4 +86,57 @@ describe('expenses API', () => {
     expect(response.body.data).toHaveLength(1);
     expect(response.body.total).toBe('9.00');
   });
+
+  test('GET /expenses/dashboard/months returns months sorted oldest first', async () => {
+    await request(app).post('/expenses').send({ amount: '5.00', category: 'Food', date: '2025-02-10' });
+    await request(app).post('/expenses').send({ amount: '7.00', category: 'Food', date: '2025-01-10' });
+
+    const response = await request(app).get('/expenses/dashboard/months');
+    expect(response.status).toBe(200);
+    expect(response.body.data.map((row) => row.month)).toEqual(['2025-01', '2025-02']);
+  });
+
+  test('GET /expenses/dashboard/months returns correct total per month', async () => {
+    await request(app).post('/expenses').send({ amount: '10.25', category: 'Food', date: '2025-01-10' });
+    await request(app).post('/expenses').send({ amount: '15.75', category: 'Transport', date: '2025-01-11' });
+
+    const response = await request(app).get('/expenses/dashboard/months');
+    expect(response.status).toBe(200);
+    expect(response.body.data[0].total).toBe('26.00');
+  });
+
+  test('GET /expenses/dashboard/months/:month/categories returns correct percent values', async () => {
+    await request(app).post('/expenses').send({ amount: '30.00', category: 'Food', date: '2025-03-01' });
+    await request(app).post('/expenses').send({ amount: '10.00', category: 'Transport', date: '2025-03-02' });
+
+    const response = await request(app).get('/expenses/dashboard/months/2025-03/categories');
+    expect(response.status).toBe(200);
+    const food = response.body.data.find((row) => row.category === 'Food');
+    const transport = response.body.data.find((row) => row.category === 'Transport');
+    expect(food.percent).toBe(75);
+    expect(transport.percent).toBe(25);
+  });
+
+  test('GET /expenses/dashboard/months/badformat/categories returns 400', async () => {
+    const response = await request(app).get('/expenses/dashboard/months/2025_03/categories');
+    expect(response.status).toBe(400);
+  });
+
+  test('GET /expenses/dashboard/months/:month/categories/:category is case-insensitive', async () => {
+    await request(app).post('/expenses').send({ amount: '9.50', category: 'food', date: '2025-04-05' });
+
+    const response = await request(app).get('/expenses/dashboard/months/2025-04/categories/Food');
+    expect(response.status).toBe(200);
+    expect(response.body.count).toBe(1);
+    expect(response.body.total).toBe('9.50');
+  });
+
+  test('GET /expenses/dashboard/months/:month/categories/:category returns expenses sorted date DESC', async () => {
+    await request(app).post('/expenses').send({ amount: '5.00', category: 'Food', date: '2025-05-01' });
+    await request(app).post('/expenses').send({ amount: '7.00', category: 'Food', date: '2025-05-09' });
+
+    const response = await request(app).get('/expenses/dashboard/months/2025-05/categories/Food');
+    expect(response.status).toBe(200);
+    expect(response.body.expenses[0].date).toBe('2025-05-09');
+  });
 });

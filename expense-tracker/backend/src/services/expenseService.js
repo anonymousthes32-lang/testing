@@ -112,7 +112,73 @@ function createExpenseService(db) {
     };
   }
 
-  return { createExpense, listExpenses, getCategorySummary, getExpensesByCategory };
+  function getMonthlyTotals() {
+    const rows = db.prepare(`
+      SELECT
+        strftime('%Y-%m', date) AS month,
+        SUM(amount)             AS total_cents,
+        COUNT(*)                AS count
+      FROM expenses
+      GROUP BY month
+      ORDER BY month ASC
+    `).all();
+
+    return rows.map((row) => ({
+      month: row.month,
+      total: centsToDecimalString(row.total_cents),
+      count: row.count,
+    }));
+  }
+
+  function getMonthlyCategoryBreakdown(month) {
+    const rows = db.prepare(`
+      SELECT
+        category,
+        SUM(amount) AS total_cents,
+        COUNT(*)    AS count
+      FROM expenses
+      WHERE strftime('%Y-%m', date) = ?
+      GROUP BY category
+      ORDER BY total_cents DESC
+    `).all(month);
+
+    const monthTotalCents = rows.reduce((sum, row) => sum + row.total_cents, 0);
+
+    return rows.map((row) => ({
+      category: row.category,
+      total: centsToDecimalString(row.total_cents),
+      count: row.count,
+      percent: monthTotalCents === 0 ? 0 : Number(((row.total_cents / monthTotalCents) * 100).toFixed(1)),
+    }));
+  }
+
+  function getMonthCategoryExpenses(month, category) {
+    const rows = db.prepare(`
+      SELECT id, amount, category, description, date, created_at
+      FROM expenses
+      WHERE strftime('%Y-%m', date) = ?
+        AND lower(category) = lower(?)
+      ORDER BY date DESC, created_at DESC
+    `).all(month, category);
+
+    const totalCents = rows.reduce((sum, row) => sum + row.amount, 0);
+
+    return {
+      expenses: rows.map(mapExpense),
+      total: centsToDecimalString(totalCents),
+      count: rows.length,
+    };
+  }
+
+  return {
+    createExpense,
+    listExpenses,
+    getCategorySummary,
+    getExpensesByCategory,
+    getMonthlyTotals,
+    getMonthlyCategoryBreakdown,
+    getMonthCategoryExpenses,
+  };
 }
 
 module.exports = { createExpenseService, toCents, centsToDecimalString };

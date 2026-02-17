@@ -42,3 +42,22 @@ export async function fetchByCategory(category) {
   const response = await fetch(`${BASE}/expenses/category/${encodeURIComponent(category)}`);
   return parseResponse(response);
 }
+
+export async function fetchMonthlyTotals() {
+  const response = await fetch(`${BASE}/expenses/dashboard/months`);
+  const result = await parseResponse(response);
+  return result.data;
+}
+
+export async function fetchMonthlyCategoryBreakdown(month) {
+  const response = await fetch(`${BASE}/expenses/dashboard/months/${encodeURIComponent(month)}/categories`);
+  const result = await parseResponse(response);
+  return result.data;
+}
+
+export async function fetchMonthCategoryExpenses(month, category) {
+  const response = await fetch(
+    `${BASE}/expenses/dashboard/months/${encodeURIComponent(month)}/categories/${encodeURIComponent(category)}`,
+  );
+  return parseResponse(response);
+}
