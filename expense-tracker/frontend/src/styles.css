@@ -1,0 +1,156 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --bg: #0b1020;
+  --bg-elevated: #141b2d;
+  --bg-hover: #1a2338;
+  --panel: #111827;
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #25324a;
+  --radius-md: 14px;
+  --transition: 220ms ease;
+  --accent: #c8a96e;
+  --accent-dim: #a98a53;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(circle at top, #101832 0%, var(--bg) 55%); color: var(--text-primary); }
+.container { max-width: 1200px; margin: 0 auto; padding: 28px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.header h1 { margin: 0; font-size: 1.8rem; letter-spacing: -0.02em; }
+.header-btn { width: auto; background: var(--accent); color: #1f2937; border: none; font-weight: 700; padding: 10px 18px; border-radius: 999px; }
+.header-btn:hover { background: #d4b57d; }
+
+.layout { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: flex-start; }
+.card { background: linear-gradient(180deg, rgba(20,27,45,0.95), rgba(17,24,39,0.95)); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+
+input, textarea, select, button { width: 100%; margin-bottom: 8px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: var(--text-primary); }
+button { cursor: pointer; }
+label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
+
+.filter-bar { display: flex; gap: 8px; align-items: center; }
+.filter-bar select, .filter-bar button { margin: 0; }
+.link { background: none; border: none; color: #93c5fd; text-decoration: underline; padding: 0; width: auto; }
+
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { border-bottom: 1px solid var(--border); padding: 10px 8px; text-align: left; }
+.table th { color: #cbd5e1; font-weight: 600; }
+.table tbody tr:nth-child(even) { background: rgba(30,41,59,0.35); }
+
+.error-banner, .error-text { color: #fca5a5; }
+.warning-text { color: #fbbf24; }
+.flash-success { background: #064e3b; color: #a7f3d0; padding: 8px; border-radius: 8px; }
+
+.skeleton { height: 16px; width: 100%; background: linear-gradient(90deg,#1f2937,#334155,#1f2937); background-size: 200% 100%; animation: pulse 1.2s infinite; }
+@keyframes pulse { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.spinner-wrap { display:flex; justify-content:center; align-items:center; min-height:260px; }
+.spinner { width:36px; height:36px; border:4px solid #334155; border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.chart-container { margin-bottom: 16px; }
+.chart-title { font-weight: 700; margin-bottom: 12px; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.summary-tile { text-align: left; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 14px; transition: all var(--transition); }
+.summary-tile:hover { border-color: var(--accent-dim); background: var(--bg-hover); transform: translateY(-2px); }
+.summary-head { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.summary-total { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; margin-bottom: 4px; }
+.summary-meta { color: var(--text-muted); font-size: .82rem; margin-bottom: 10px; }
+
+.drilldown-header { margin-bottom: 12px; }
+.btn-back { width: auto; background: transparent; border: 1px solid var(--border); color: #cbd5e1; margin-bottom: 12px; }
+.btn-back:hover { background: #1f2937; }
+.drilldown-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.8rem; margin-bottom: 10px; }
+.drilldown-stats { display: flex; gap: 18px; }
+.drilldown-stat { display: flex; flex-direction: column; }
+.drilldown-stat-value { font-size: 1.2rem; font-weight: 700; color: #fbbf24; }
+.drilldown-stat-label { color: var(--text-muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
+.drilldown-stats.simple { align-items: center; }
+.muted-inline { color: var(--text-muted); font-size: 1.2rem; }
+
+.amount-cell { text-align: right; font-family: 'JetBrains Mono', monospace; color: #fcd34d; }
+.desc-cell.empty { color: var(--text-muted); }
+
+.empty-state { border: 1px dashed var(--border); border-radius: var(--radius-md); padding: 30px; text-align: center; background: rgba(20,27,45,0.6); }
+.empty-icon { font-size: 2rem; margin-bottom: 8px; }
+.empty-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+.empty-sub { color: var(--text-muted); }
+
+/* ── Month Cards Grid (Level 1) ─────────────────────────────── */
+.month-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.month-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.month-card:hover {
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  background: var(--bg-hover);
+}
+
+.month-card-name {
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.month-card-total {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.month-card-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.month-card-bar {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.month-card-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Dashboard Wrap ─────────────────────────────────────────── */
+.dashboard-wrap {
+  animation: fadeUp 0.3s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 960px) {
+  .layout { grid-template-columns: 1fr; }
+  .filter-bar { flex-wrap: wrap; }
+}
