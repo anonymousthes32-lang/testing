@@ -9,6 +9,40 @@
 3. Start backend: `cd backend && npm run dev`
 4. Start frontend: `cd frontend && npm run dev`
 
+
+### Deploying (Detailed: Render backend + Netlify frontend)
+1. **Backend on Render**
+   - Create a new **Web Service** from your GitHub repo.
+   - Set **Root Directory** to `expense-tracker/backend`.
+   - Build command: `npm install`
+   - Start command: `npm start`
+   - Add env vars:
+     - `DB_PATH=./data/expenses.db`
+     - `CORS_ORIGIN=https://<your-netlify-site>.netlify.app`
+     - (Optional) `PORT=3000` (Render injects `PORT`, but local default exists).
+
+2. **Frontend on Netlify**
+   - Create a new site from the same repo.
+   - Set **Base directory** to `expense-tracker/frontend`.
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+   - Add env var:
+     - `VITE_API_URL=https://<your-render-service>.onrender.com`
+
+3. **Redeploy order**
+   - Deploy backend first, copy Render URL.
+   - Set frontend `VITE_API_URL` to that URL and redeploy frontend.
+   - Then update backend `CORS_ORIGIN` to your final frontend URL and redeploy backend.
+
+4. **Common Render error you saw (`ERR_SOCKET_BAD_PORT`)**
+   - This happens when `PORT` is not a valid integer.
+   - This project now guards invalid `PORT` and falls back to `3000` so deploys don't crash on bad values.
+
+5. **Important SQLite note**
+   - SQLite is file-based and great for demos.
+   - Some free hosting environments may reset data after restarts or instance recreation.
+   - If you need durable production data, switch to Postgres later.
+
 Deployment note:
 - Use Render.com (free tier) for the Express backend (persistent server process; SQLite works for demo use).
 - Use Vercel or Netlify for the React frontend.
